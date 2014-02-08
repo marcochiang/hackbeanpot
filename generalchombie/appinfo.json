@@ -1,0 +1,17 @@
+{
+  "uuid": "9a7b9ff2-4ff6-4341-b513-7b96b23a0f09",
+  "shortName": "generalchombie",
+  "longName": "generalchombie",
+  "companyName": "MakeAwesomeHappen",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": []
+  }
+}
