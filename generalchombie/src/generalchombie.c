@@ -36,7 +36,7 @@ typedef struct schedule{
 }schedule;
 
 static schedule appSched[NUM_EVENTS];
-static char strCnt[10];
+static char strCnt[5];
 static int cur_index = 0;
 
 void find_event_time(struct schedule appSched[NUM_EVENTS], int index) {
@@ -49,17 +49,17 @@ void find_event_time(struct schedule appSched[NUM_EVENTS], int index) {
   tm = localtime(&then);
 
   curTime = (tm->tm_hour)*3600 + (tm->tm_min)*60 + (tm->tm_sec); //in sec
-  //timer_elapse = curTime;
   appSched[index].elapsed_time_sec = appSched[index].end_time_sec - curTime;
 }
 
 void handle_timer(void* data) {
     if(appSched[cur_index].elapsed_time_sec <= 0) {
-      find_event_time(appSched, cur_index++);
+      cur_index++;
+      find_event_time(appSched, cur_index);
       //vibrate
     }
     //appSched.elapsed_time_sec = appSched.elapsed_time_sec - 1;
-    snprintf(strCnt, 10, "%d", appSched[cur_index].elapsed_time_sec--);
+    snprintf(strCnt, 5, "%d", appSched[cur_index].elapsed_time_sec--);
 
     text_layer_set_text(text_layer, strCnt);
     update_timer = app_timer_register(1000, handle_timer, NULL);
@@ -72,7 +72,7 @@ void generate_events(void) {
   //EVT1
   appSched[0].evt_name = "shower";
   appSched[0].start_time = "2220";
-  appSched[0].end_time = "2321";
+  appSched[0].end_time = "2339";
   appSched[0].end_time_sec = convertTime(appSched[0].end_time);
   //EVT2
   appSched[1].evt_name = "poop";
@@ -207,7 +207,7 @@ static void init(void) {
 
     generate_events();
 
-    find_event_time(appSched, 0);
+    find_event_time(appSched, cur_index);
     update_timer = app_timer_register(1000, handle_timer, NULL);
 
 
@@ -218,6 +218,7 @@ static void init(void) {
 
 
 static void deinit(void) {
+  app_timer_cancel(update_timer);
     window_destroy(window);
     // window_destroy(appWindow);
 }
