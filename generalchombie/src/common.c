@@ -8,7 +8,7 @@ int convertTime(char *time) {
 	char *min = (char*) malloc(3);
 	strncpy(min, time+2, 2);
 
-	return atoi(hour)*60 + atoi(min);
+	return atoi(hour)*3600 + atoi(min)*60;
 }
 
 char* concatStr(char *s1, char *s2)

@@ -28,21 +28,19 @@ typedef struct schedule{
     char* evt_name;  
     char* start_time;
     char* end_time;
-    char* cur_time;
     //these times are starting from 12:00 AM
-    int start_time_min;
-    int end_time_min;
+    int start_time_sec;
     int elapsed_time_sec;
 }schedule;
 
-static schedule appSched[NUM_EVENTS];
+static schedule *appSched[NUM_EVENTS];
 
 
 static void appWindow_load(Window *window) {
     for(int i = 0; i < NUM_EVENTS; i++) {
         first_menu_items[i] = (SimpleMenuItem){
-            .title = appSched[i].evt_name,
-            .subtitle = concatStr(appSched[i].start_time, appSched[i].end_time),
+            .title = appSched[i]->evt_name,
+            .subtitle = concatStr(appSched[i]->start_time, appSched[i]->end_time),
           };
     }
   // Bind the menu items to the corresponding menu sections
@@ -122,18 +120,18 @@ static void window_unload(Window *window) {
 
 
 void generate_events(void) {
+  //malloc
+  schedule *appSched = malloc(sizeof(*appSched)*NUM_EVENTS);
   //EVT1
   appSched[0].evt_name = "shower";
   appSched[0].start_time = "2012";
   appSched[0].end_time = "2022";
-  appSched[0].start_time_min = convertTime(appSched[0].start_time);
-  appSched[0].end_time_min = convertTime(appSched[0].end_time);
+  appSched[0].start_time_sec = convertTime(appSched[0].start_time);
   //EVT2
   appSched[1].evt_name = "poop";
   appSched[1].start_time = "2100";
   appSched[1].end_time = "2110";
-  appSched[1].start_time_min = convertTime(appSched[1].start_time);
-  appSched[1].end_time_min = convertTime(appSched[1].end_time);
+  appSched[1].start_time_sec = convertTime(appSched[1].start_time);
 }
 
 static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
@@ -148,8 +146,8 @@ static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
   //display_time(tick_time);
 }
 
-void find_event_time() {
-    //get current time
+void find_event_time(struct schedule *appSched) {
+  //get current time
   struct tm *tm;
   time_t then;
   int curTime; //in seconds
@@ -157,17 +155,14 @@ void find_event_time() {
   then = time(NULL);
   tm = localtime(&then);
 
-  int duration =  (appSched[0].end_time_min - appSched[0].start_time_min)*60; //in sec
-
-
   curTime = (tm->tm_hour)*3600 + (tm->tm_min)*60 + (tm->tm_sec); //in sec
-
-  timer_elapse = duration - curTime;
+  timer_elapse = curTime;
+  //appSched->elapsed_time_sec = curTime;
 }
 
 void handle_timer(void* data) {
 
-    snprintf(strCnt, 10, "%d", timer_elapse);
+    snprintf(strCnt, 10, "%d", timer_elapse--);
 
     text_layer_set_text(text_layer, strCnt);
     update_timer = app_timer_register(1000, handle_timer, NULL);
@@ -185,8 +180,8 @@ static void init(void) {
 
   generate_events();
 
-  find_event_time();
   update_timer = app_timer_register(1000, handle_timer, NULL);
+  find_event_time(appSched[0]);
 
   window_stack_push(window, animated);
 }
