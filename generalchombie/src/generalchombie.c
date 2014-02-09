@@ -12,6 +12,9 @@
 #define NUM_MENU_SECTIONS 1
 #define NUM_FIRST_MENU_ITEMS 3
 
+#define TRUE 1
+#define FALSE 0
+
 static Window *window;
 static Window *appWindow;
 
@@ -23,6 +26,7 @@ static SimpleMenuLayer *simple_menu_layer;
 static SimpleMenuSection menu_sections[NUM_MENU_SECTIONS];
 static SimpleMenuItem first_menu_items[NUM_FIRST_MENU_ITEMS];
 
+static bool snooze = TRUE;
 
 static AppTimer* update_timer = NULL;
 
@@ -55,9 +59,17 @@ void find_event_time(struct schedule appSched[NUM_EVENTS], int index) {
 void handle_timer(void* data) {
     if(appSched[cur_index].elapsed_time_sec <= 0) {
       cur_index++;
+
+      snooze=FALSE;
+      
       find_event_time(appSched, cur_index);
       //vibrate
     }
+
+    if(snooze){
+       vibes_short_pulse();
+    }
+
     appSched[cur_index].elapsed_time_sec = appSched[cur_index].elapsed_time_sec - 1;
     snprintf(strCnt, 5, "%d", appSched[cur_index].elapsed_time_sec);
 
@@ -75,17 +87,17 @@ void generate_events(void) {
   //EVT1
   appSched[0].evt_name = "shower";
   appSched[0].start_time = "0001";
-  appSched[0].end_time = "0011";
+  appSched[0].end_time = "0028";
   appSched[0].end_time_sec = convertTime(appSched[0].end_time);
   //EVT2
   appSched[1].evt_name = "poop";
   appSched[1].start_time = "0011";
-  appSched[1].end_time = "0012";
+  appSched[1].end_time = "0029";
   appSched[1].end_time_sec = convertTime(appSched[1].end_time);
   //EVT3
   appSched[2].evt_name = "eat";
   appSched[2].start_time = "0012";
-  appSched[2].end_time = "0013";
+  appSched[2].end_time = "0030";
   appSched[2].end_time_sec = convertTime(appSched[2].end_time);
 }
 
@@ -147,7 +159,9 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
  }
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) { }
-static void down_click_handler(ClickRecognizerRef recognizer, void *context) { }
+static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
+  snooze = TRUE;
+}
 static void handle_accel(AccelData *accel_data, uint32_t num_samples) { }
 
 
