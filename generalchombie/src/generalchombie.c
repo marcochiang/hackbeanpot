@@ -5,6 +5,9 @@
  */
 
 #include <pebble.h>
+#include "common.h"
+
+#define NUM_EVENTS  2
 
 #define NUM_MENU_SECTIONS 1
 #define NUM_FIRST_MENU_ITEMS 3
@@ -18,6 +21,62 @@ static SimpleMenuLayer *simple_menu_layer;
 static SimpleMenuSection menu_sections[NUM_MENU_SECTIONS];
 static SimpleMenuItem first_menu_items[NUM_FIRST_MENU_ITEMS];
 
+
+static AppTimer* update_timer = NULL;
+
+typedef struct schedule{
+    char* evt_name;  
+    char* start_time;
+    char* end_time;
+    //these times are starting from 12:00 AM
+    int end_time_sec;
+    int elapsed_time_sec;
+}schedule;
+
+static schedule appSched[NUM_EVENTS];
+
+
+void find_event_time(struct schedule appSched[NUM_EVENTS], int index) {
+  //get current time
+  struct tm *tm;
+  time_t then;
+  int curTime; //in seconds
+
+  then = time(NULL);
+  tm = localtime(&then);
+
+  curTime = (tm->tm_hour)*3600 + (tm->tm_min)*60 + (tm->tm_sec); //in sec
+  //timer_elapse = curTime;
+  appSched[index].elapsed_time_sec = appSched[index].end_time_sec - curTime;
+}
+
+void generate_events(void) {
+  //malloc
+  ///*appSched = malloc(sizeof(*appSched)*NUM_EVENTS);
+  //EVT1
+  appSched[0].evt_name = "shower";
+  appSched[0].start_time = "2220";
+  appSched[0].end_time = "2238";
+  appSched[0].end_time_sec = convertTime(appSched[0].end_time);
+  //EVT2
+  appSched[1].evt_name = "poop";
+  appSched[1].start_time = "2300";
+  appSched[1].end_time = "2310";
+  appSched[1].end_time_sec = convertTime(appSched[1].end_time);
+}
+
+
+void handle_timer(void* data) {
+    // if(appSched[cur_index].elapsed_time_sec <= 0) {
+    //   find_event_time(appSched, cur_index++);
+    //   //vibrate
+    // }
+    // //appSched.elapsed_time_sec = appSched.elapsed_time_sec - 1;
+    // snprintf(strCnt, 10, "%d", appSched[cur_index].elapsed_time_sec--);
+
+    // text_layer_set_text(text_layer, strCnt);
+    // update_timer = app_timer_register(1000, handle_timer, NULL);
+}
 
 
 static void appWindow_load(Window *window) {
@@ -129,6 +188,13 @@ static void init(void) {
       .unload = window_unload,
     });
     const bool animated = true;
+
+    generate_events();
+
+    find_event_time(appSched, 0);
+    update_timer = app_timer_register(1000, handle_timer, NULL);
+
+
     window_stack_push(window, animated);
 
 }
