@@ -45,20 +45,21 @@ static int cur_index = 0;
 
 void find_event_time(struct schedule appSched[NUM_EVENTS], int index) {
   //get current time
-  struct tm *tm;
-  time_t then;
+  //struct tm *tm;
+  //time_t then;
   int curTime; //in seconds
 
-  then = time(NULL);
-  tm = localtime(&then);
+  //then = time(NULL);
+  //tm = localtime(&then);
 
-  curTime = (tm->tm_hour)*3600 + (tm->tm_min)*60 + (tm->tm_sec); //in sec
+  //curTime = (tm->tm_hour)*3600 + (tm->tm_min)*60 + (tm->tm_sec); //real time
+  curTime = 105 + (cur_index)*45; //105 seconds
   appSched[index].elapsed_time_sec = appSched[index].end_time_sec - curTime;
 }
 
 void handle_timer(void* data) {
     if(appSched[cur_index].elapsed_time_sec <= 0) {
-      cur_index++;
+      cur_index = (cur_index+1)%NUM_EVENTS;
 
       snooze=FALSE;
       
@@ -66,7 +67,7 @@ void handle_timer(void* data) {
       //vibrate
     }
 
-    if(snooze){
+    if(!snooze){
        vibes_short_pulse();
     }
 
@@ -87,17 +88,17 @@ void generate_events(void) {
   //EVT1
   appSched[0].evt_name = "shower";
   appSched[0].start_time = "0001";
-  appSched[0].end_time = "0028";
+  appSched[0].end_time = "0002";
   appSched[0].end_time_sec = convertTime(appSched[0].end_time);
   //EVT2
   appSched[1].evt_name = "poop";
-  appSched[1].start_time = "0011";
-  appSched[1].end_time = "0029";
+  appSched[1].start_time = "0002";
+  appSched[1].end_time = "0003";
   appSched[1].end_time_sec = convertTime(appSched[1].end_time);
   //EVT3
   appSched[2].evt_name = "eat";
-  appSched[2].start_time = "0012";
-  appSched[2].end_time = "0030";
+  appSched[2].start_time = "0003";
+  appSched[2].end_time = "0004";
   appSched[2].end_time_sec = convertTime(appSched[2].end_time);
 }
 
