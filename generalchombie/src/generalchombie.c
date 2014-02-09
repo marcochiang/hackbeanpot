@@ -211,12 +211,11 @@ static void init(void) {
 
 static void deinit(void) {
     window_destroy(window);
-    window_destroy(appWindow);
+    // window_destroy(appWindow);
 }
 
 int main(void) {
     init();
-    //app_message_init();
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
   
   app_event_loop();
