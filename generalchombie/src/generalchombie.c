@@ -14,6 +14,8 @@
 
 static Window *window;
 static Window *appWindow;
+
+static TextLayer *text_layer;
 static TextLayer *first_name_layer;
 static TextLayer *last_name_layer;
 
@@ -172,9 +174,15 @@ static void window_load(Window *window) {
     text_layer_set_text_alignment(last_name_layer, GTextAlignmentRight);
     text_layer_set_font(last_name_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
     layer_add_child(window_layer, text_layer_get_layer(last_name_layer));
+
+    text_layer = text_layer_create((GRect) { .origin = { 0, 120 }, .size = { bounds.size.w, 20 } });
+    text_layer_set_text(text_layer, "00 : 00: 00");
+    text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
+    layer_add_child(window_layer, text_layer_get_layer(text_layer));
 }
 
 static void window_unload(Window *window) {
+    text_layer_destroy(text_layer);
     text_layer_destroy(first_name_layer);
     text_layer_destroy(last_name_layer);
 }
@@ -203,6 +211,7 @@ static void init(void) {
 
 static void deinit(void) {
     window_destroy(window);
+    window_destroy(appWindow);
 }
 
 int main(void) {
