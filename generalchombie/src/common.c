@@ -1,21 +1,59 @@
 #include <pebble.h>
 
-int convertTime(char *time) {
-	//hour
-	char *hour = (char*) malloc(3);
-	strncpy(hour, time, 2);
-	//sec
-	char *min = (char*) malloc(3);
-	strncpy(min, time+2, 2);
-
-	return atoi(hour)*3600 + atoi(min)*60;
+int convertTime(int timeHH, int timeMM) {
+	return timeHH*3600 + timeMM*60;
 }
 
-char* concatStr(char *s1, char *s2)
+char* convertToTimeFMT(int s1HH, int s1MM, int s2HH, int s2MM)
 {
-	size_t len1 = strlen(s1);
-    size_t len2 = strlen(s2);
-	char *output = (char *)malloc(len1+len2+4);
-	snprintf(output, len1+len2+4, "%s - %s", s1, s2);
+	char *s12_1;
+	char *s12_2;
+
+	if(s1HH <= 0) {
+		s1HH = 12;
+		s12_1 = "AM";
+	}
+	else if(s1HH > 0 && s1HH < 12) {
+		s12_1 = "AM";
+	}
+	else if(s1HH == 12) {
+		s12_1 = "PM";
+	}
+	else {
+		s12_1 = "PM";
+		s1HH = s1HH-12;
+	}
+
+
+	if(s2HH <= 0) {
+		s2HH = 12;
+		s12_2 = "AM";
+	}
+	else if(s2HH > 0 && s2HH < 12) {
+		s12_2 = "AM";
+	}
+	else if(s2HH == 12) {
+		s12_2 = "PM";
+	}
+	else {
+		s12_2 = "PM";
+		s2HH = s2HH-12;
+	}
+
+	char *output = (char *)malloc(20);
+	snprintf(output, 20, "%02d:%02d %s - %02d:%02d %s", s1HH, s1MM, s12_1, s2HH, s2MM, s12_2);
+  	//snprintf(output, 20, "%d,", s1HH);
   	return output;
+ }
+
+ char* convertToTimerFMT(int seconds) {
+ 	char *output = (char *)malloc(9);
+ 	int temp = seconds;
+ 	int hr = (int)temp/3600;
+ 	temp -= hr*3600;
+ 	int min = (int)temp/60;
+ 	temp -= min*60;
+ 	int sec = temp;
+ 	snprintf(output, 9, "%02d:%02d:%02d", hr, min, sec);
+ 	return output;
  }

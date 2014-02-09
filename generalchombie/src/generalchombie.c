@@ -32,8 +32,10 @@ static AppTimer* update_timer = NULL;
 
 typedef struct schedule{
     char* evt_name;  
-    char* start_time;
-    char* end_time;
+    int start_time_HH;
+    int start_time_MM;
+    int end_time_HH;
+    int end_time_MM;
     //these times are starting from 12:00 AM
     int end_time_sec;
     int elapsed_time_sec;
@@ -72,11 +74,11 @@ void handle_timer(void* data) {
     }
 
     appSched[cur_index].elapsed_time_sec = appSched[cur_index].elapsed_time_sec - 1;
-    snprintf(strCnt, 5, "%d", appSched[cur_index].elapsed_time_sec);
+    //snprintf(strCnt, 5, "%d", appSched[cur_index].elapsed_time_sec);
 
     text_layer_set_text(first_name_layer, appSched[cur_index].evt_name);
     text_layer_set_text(last_name_layer, "");
-    text_layer_set_text(text_layer, strCnt);
+    text_layer_set_text(text_layer, convertToTimerFMT(appSched[cur_index].elapsed_time_sec));
 
     update_timer = app_timer_register(1000, handle_timer, NULL);
 }
@@ -87,19 +89,25 @@ void generate_events(void) {
   ///*appSched = malloc(sizeof(*appSched)*NUM_EVENTS);
   //EVT1
   appSched[0].evt_name = "shower";
-  appSched[0].start_time = "0001";
-  appSched[0].end_time = "0002";
-  appSched[0].end_time_sec = convertTime(appSched[0].end_time);
+  appSched[0].start_time_HH = 00;
+  appSched[0].start_time_MM = 01;
+  appSched[0].end_time_HH = 00;
+  appSched[0].end_time_MM = 02;
+  appSched[0].end_time_sec = convertTime(appSched[0].end_time_HH, appSched[0].end_time_MM);
   //EVT2
   appSched[1].evt_name = "poop";
-  appSched[1].start_time = "0002";
-  appSched[1].end_time = "0003";
-  appSched[1].end_time_sec = convertTime(appSched[1].end_time);
+  appSched[1].start_time_HH = 00;
+  appSched[1].start_time_MM = 02;
+  appSched[1].end_time_HH = 00;
+  appSched[1].end_time_MM = 03;
+  appSched[1].end_time_sec = convertTime(appSched[1].end_time_HH, appSched[1].end_time_MM);
   //EVT3
   appSched[2].evt_name = "eat";
-  appSched[2].start_time = "0003";
-  appSched[2].end_time = "0004";
-  appSched[2].end_time_sec = convertTime(appSched[2].end_time);
+  appSched[2].start_time_HH = 00;
+  appSched[2].start_time_MM = 03;
+  appSched[2].end_time_HH = 00;
+  appSched[2].end_time_MM = 04;
+  appSched[2].end_time_sec = convertTime(appSched[2].end_time_HH, appSched[2].end_time_MM);
 }
 
 
@@ -119,7 +127,10 @@ static void appWindow_load(Window *window) {
       for(int i = 0; i < NUM_EVENTS; i++) {
         first_menu_items[i] = (SimpleMenuItem){
             .title = appSched[i].evt_name,
-            .subtitle = concatStr(appSched[i].start_time, appSched[i].end_time),
+            .subtitle = convertToTimeFMT(appSched[i].start_time_HH, 
+                                  appSched[i].start_time_MM,
+                                  appSched[i].end_time_HH,
+                                  appSched[i].end_time_MM),
           };
     }
 
